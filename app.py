@@ -16,17 +16,16 @@ st.write("Explore publication trends, sources, and keywords in COVID-19 related 
 # Load data
 # Show a preview
 st.subheader("Sample of the dataset")
-st.dataframe(df.sample(10))  # show 10 random rows
-
+st.dataframe(df.head(10))  # show first 10 rows
 
 # Interactive filters
-years = sorted(df['publish_year'].dropna().unique())
+years = sorted(df['publish_year'].unique())
 min_year, max_year = st.slider("Select publication year range:", 
                                int(min(years)), int(max(years)),
-                               (2000, 2023))
+                               (1997, 2012))
 
 source_filter = st.selectbox("Filter by source (optional):", 
-                             options=["All"] + list(df['source_x'].dropna().unique()[:50]))
+                             options=["All"] + list(df['source_x'].unique()[:50]))
 
 # Apply filters
 filtered = df[(df['publish_year'].between(min_year, max_year)) & (df['publish_year'] != 2050)]
@@ -72,7 +71,7 @@ stopwords.update([
 ])
 
 # Break titles into smaller chunks to avoid memory issues
-chunks = np.array_split(filtered['title'].dropna().astype(str), 10)
+chunks = np.array_split(filtered['title'].astype(str), 10)
 
 word_counts = Counter()
 wc_tmp = WordCloud(stopwords=stopwords)

@@ -25,9 +25,11 @@ df.describe()
 print(df.isna())
 
 # Data cleaning and preparation
+df = df.dropna(axis=1, thresh=len(df) /2) # Drop columns with more than 50% missing values
 df = df.fillna({
     'cord_uid' : 'absent',
     'source_x' : 'POO',
+    'sha' : 'absent',
     'title' : 'No Title',
     'doi' : '10.1186/rr61',
     'license' : 'no-cc',
@@ -35,19 +37,18 @@ df = df.fillna({
     'publish_time' : '2050-09-24',
     'authors' : 'No author(s)',
     'journal' : 'No journal available',
-    'url' : 'https://placeholderwebsite.com',
-    's2_id' : 0,  
+    'url' : 'https://placeholderwebsite.com'
 })
-df = df.dropna(axis=1, thresh=len(df) /2)
-cols_to_convert = ['cord_uid', 'source_x', 'title', 'doi', 'license', 'abstract', 'publish_time', 'authors', 'journal', 'url']
+df = df.drop(columns=['pmc_json_files', 'pdf_json_files', 's2_id'], errors='ignore')
+cols_to_convert = ['cord_uid', 'sha', 'source_x', 'title', 'doi', 'license', 'abstract', 'publish_time', 'authors', 'journal', 'url']
 df[cols_to_convert] = df[cols_to_convert].astype("string")
-df['s2_id'] = pd.to_numeric(df['s2_id'], errors = 'raise')
 
 # Convert date columns to datetime format
 df['publish_time'] = pd.to_datetime(df['publish_time'], format = 'mixed')
 
 # Extract year from publication date
 df['publish_year'] = df['publish_time'].dt.year
+print(df.head())
 
 # Papers by publication year
 papers_per_year = df.groupby('publish_year').size().reset_index(name='paper_count')
@@ -97,7 +98,7 @@ plt.title("Number of Publications Over Time (Excluding 2050)")
 plt.xlabel("Year")
 plt.ylabel("Number of Publications")
 plt.grid(True)
-plt.show()
+plt.savefig('images/plot1.png')
 
 # Word cloud of paper titles
 # Collect all titles (drop NaN and placeholders)
@@ -126,7 +127,7 @@ plt.figure(figsize=(15, 8))
 plt.imshow(wordcloud, interpolation='bilinear')
 plt.axis('off')
 plt.title("Word Cloud of Research Paper Titles", fontsize=18)
-plt.show()
+plt.savefig('images/plot2.png')
 
 # Distribution plot of paper count by source
 top = df['source_x'].value_counts().nlargest(15)  # Series: index=source, values=counts
@@ -138,5 +139,4 @@ plt.xlabel("Paper Count")
 plt.ylabel("Source")
 plt.grid(axis='x', linestyle='--', alpha=0.5)
 plt.tight_layout()
-plt.show()
-
+plt.savefig('images/plot3.png')
