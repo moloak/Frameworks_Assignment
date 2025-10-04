@@ -16,7 +16,7 @@ st.write("Explore publication trends, sources, and keywords in COVID-19 related 
 # Load data
 # Show a preview
 st.subheader("Sample of the dataset")
-st.dataframe(df.head(10))  # show first 10 rows
+st.dataframe(df.sample(10))  # show first 10 rows
 
 # Interactive filters
 years = sorted(df['publish_year'].unique())
@@ -28,7 +28,7 @@ source_filter = st.selectbox("Filter by source (optional):",
                              options=["All"] + list(df['source_x'].unique()[:50]))
 
 # Apply filters
-filtered = df[(df['publish_year'].between(min_year, max_year)) & (df['publish_year'] != 2050)]
+filtered = df[(df['publish_year'].between(min_year, max_year))]
 if source_filter != "All":
     filtered = filtered[filtered['source_x'] == source_filter]
 
@@ -44,7 +44,7 @@ papers_per_year = (
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(papers_per_year['publish_year'], papers_per_year['paper_count'], marker='o')
-ax.set_title("Number of Publications Over Time (Excluding 2050)")
+ax.set_title("Number of Publications Over Time")
 ax.set_xlabel("Year")
 ax.set_ylabel("Number of Publications")
 ax.grid(True)
